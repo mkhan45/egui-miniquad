@@ -147,7 +147,7 @@ impl EguiMq {
             egui_ctx: egui::Context::default(),
             painter: painter::Painter::new(mq_ctx),
             egui_input: egui::RawInput {
-                pixels_per_point: Some(native_dpi_scale),
+                // pixels_per_point: Some(native_dpi_scale),
                 ..Default::default()
             },
             #[cfg(target_os = "macos")]
@@ -175,7 +175,7 @@ impl EguiMq {
         if self.native_dpi_scale != mq_ctx.dpi_scale() {
             // DPI scale change (maybe new monitor?). Tell egui to change:
             self.native_dpi_scale = mq_ctx.dpi_scale();
-            self.egui_input.pixels_per_point = Some(self.native_dpi_scale);
+            // self.egui_input.pixels_per_point = Some(self.native_dpi_scale);
         }
 
         let full_output = self
@@ -184,9 +184,10 @@ impl EguiMq {
 
         let egui::FullOutput {
             platform_output,
-            repaint_after: _, // miniquad always runs at full framerate
+            // repaint_after: _, // miniquad always runs at full framerate
             textures_delta,
             shapes,
+            ..
         } = full_output;
 
         if self.shapes.is_some() {
@@ -228,7 +229,7 @@ impl EguiMq {
     /// Must be called after `end_frame`.
     pub fn draw(&mut self, mq_ctx: &mut mq::Context) {
         if let Some(shapes) = self.shapes.take() {
-            let meshes = self.egui_ctx.tessellate(shapes);
+            let meshes = self.egui_ctx.tessellate(shapes, mq_ctx.dpi_scale());
             self.painter.paint_and_update_textures(
                 mq_ctx,
                 meshes,
